@@ -185,24 +185,8 @@ function moveCellsRight() {
   return count;
 }
 
-play.addEventListener('click', () => {
-  play.classList.add('restart');
-  play.classList.remove('start');
-  play.textContent = 'Restart';
-  result = 0;
-
-  document.querySelector('.message-start').classList.toggle('hidden', true);
-  document.querySelector('.message-lose').classList.toggle('hidden', true);
-  document.querySelector('.message-win').classList.toggle('hidden', true);
-
-  cancellation();
-  addNewValue();
-  changingCellInfo();
-  updateInfo();
-});
-
-document.addEventListener('keydown', (e) => {
-  switch (e.key) {
+function keyPressed(key) {
+  switch (key) {
     case 'ArrowUp':
       let countUp = 0;
 
@@ -331,4 +315,79 @@ document.addEventListener('keydown', (e) => {
       updateInfo();
       break;
   }
+}
+
+play.addEventListener('click', () => {
+  play.classList.add('restart');
+  play.classList.remove('start');
+  play.textContent = 'Restart';
+  result = 0;
+
+  document.querySelector('.message-start').classList.toggle('hidden', true);
+  document.querySelector('.message-lose').classList.toggle('hidden', true);
+  document.querySelector('.message-win').classList.toggle('hidden', true);
+
+  cancellation();
+  addNewValue();
+  changingCellInfo();
+  updateInfo();
+});
+
+document.addEventListener('keydown', (e) => {
+  keyPressed(e.key);
+});
+
+// Exp
+const gameField = document.querySelector('.game-field');
+
+let startPointX;
+let startPointY;
+let moved = false;
+
+function touch(e) {
+  e.preventDefault();
+
+  startPointX = e.changedTouches[0].pageX;
+  startPointY = e.changedTouches[0].pageY;
+}
+
+function move(e) {
+  if (moved) {
+    return;
+  }
+
+  e.preventDefault();
+
+  if (e.changedTouches[0].pageX > startPointX + gameField.offsetWidth / 4) {
+    keyPressed('ArrowRight');
+
+    moved = true;
+  }
+
+  if (e.changedTouches[0].pageX < startPointX - gameField.offsetWidth / 4) {
+    keyPressed('ArrowLeft');
+
+    moved = true;
+  }
+
+  if (e.changedTouches[0].pageY < startPointY - gameField.offsetHeight / 4) {
+    keyPressed('ArrowUp');
+
+    moved = true;
+  }
+
+  if (e.changedTouches[0].pageY > startPointY + gameField.offsetHeight / 4) {
+    keyPressed('ArrowDown');
+
+    moved = true;
+  }
+}
+
+gameField.addEventListener('touchmove', move);
+gameField.addEventListener('touchstart', touch);
+
+gameField.addEventListener('touchend', () => {
+  setTimeout(() => {
+    moved = !moved;
+  }, 200);
 });
